@@ -7,11 +7,13 @@ import os
 import sys
 import urllib.request
 import urllib.error
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import config as _cfg
 
 RELAY_BASE = "https://www.paulbrennaman.me/api/whoop/token"
-CREDS_PATH = os.path.expanduser(
-    "~/.openclaw/workspace/knowledge/resources/whoop-credentials.json"
-)
+CREDS_PATH = _cfg.creds_path()
 
 
 def main():
@@ -40,7 +42,7 @@ def main():
         print(f"Error: {e}")
         sys.exit(1)
 
-    os.makedirs(os.path.dirname(CREDS_PATH), exist_ok=True)
+    CREDS_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(CREDS_PATH, "w") as f:
         json.dump(tokens, f, indent=2)
 
