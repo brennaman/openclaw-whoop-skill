@@ -1,0 +1,8 @@
+{
+  "name": "whoop",
+  "version": "1.0.0",
+  "description": "Fetch and analyze WHOOP health/fitness data. Supports recovery, sleep, HRV, strain, workouts, experiment tracking, and Obsidian daily note logging.",
+  "author": "paulbrennaman",
+  "tags": ["health", "fitness", "whoop", "sleep", "hrv", "recovery"],
+  "requires": ["requests"]
+}

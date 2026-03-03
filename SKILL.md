@@ -1,0 +1,326 @@
+---
+name: whoop
+description: Fetch and analyze WHOOP health/fitness data for the authenticated user. Use when the user asks about their WHOOP stats, recovery score, HRV, sleep performance, strain, workouts, or wants a summary of recent health metrics. Handles OAuth token management (access + refresh), querying the WHOOP API, and presenting data in a readable format. See references/api.md for full endpoint reference.
+---
+
+# WHOOP Skill
+
+Fetch, interpret, chart, and track your WHOOP data via the WHOOP Developer API (v2).
+
+## Setup
+
+> **Before you begin:** This skill requires a WHOOP Developer App to authenticate with the WHOOP API. It's free and takes about 2 minutes to set up.
+
+### Step 1 — Choose your callback method
+
+Before creating your WHOOP app, decide how you want to handle the OAuth callback:
+
+**Option A — Local server** *(local installs)*
+- **Redirect URI:** `http://localhost:8888/callback`
+- A temporary server runs on your machine to catch the redirect automatically
+- Requires a browser on the same machine as OpenClaw
+
+**Option B — paulbrennaman.me relay** *(remote/cloud installs — best experience)*
+- **Redirect URI:** `https://www.paulbrennaman.me/api/whoop/callback`
+- The script prints an authorization URL — open it in any browser (e.g. on your laptop)
+- After authorizing, you'll be shown a retrieval code on paulbrennaman.me — paste it into the script
+- No local browser or open ports needed on the server
+- Tokens are never stored: held in memory for 10 minutes and deleted after retrieval
+- See https://paulbrennaman.me/privacy for details
+
+**Option C — Manual code paste** *(remote/cloud installs — no third-party relay)*
+- **Redirect URI:** `http://localhost:8888/callback`
+- The script prints an authorization URL — open it in any browser, authorize, then copy the `?code=` value from the redirect URL and paste it back into the script
+- Nothing passes through any external server — fully self-contained
+
+### Step 2 — Create a WHOOP Developer App
+
+1. Go to https://developer-dashboard.whoop.com
+2. Sign in with your WHOOP account
+3. Create a Team if prompted (any name works)
+4. Click **Create App** and fill in:
+   - **App name:** anything (e.g. "My WHOOP Skill")
+   - **Redirect URI:** the URI from Step 1 (Option A, B, or C)
+   - **Scopes:** select all `read:*` scopes + `offline`
+5. Copy your **Client ID** and **Client Secret** — you'll need them in the next step
+
+### Step 3 — Run the setup script
+
+```bash
+python3 scripts/auth.py
+```
+
+This will:
+1. Prompt you for your Client ID and Client Secret
+2. Ask which callback method you chose in Step 1 (local server, relay, or manual)
+3. Walk you through the authorization flow
+4. Save credentials to `~/.config/whoop-skill/credentials.json`
+
+**Customize paths (optional):**
+Copy `config.json.example` from the skill root to `~/.config/whoop-skill/config.json` and edit to override defaults:
+```json
+{
+  "creds_path": "~/.config/whoop-skill/credentials.json",
+  "vault_path": "~/my-obsidian-vault",
+  "daily_notes_subdir": "Daily Notes",
+  "timezone": "America/New_York",
+  "logged_by": "Hank"
+}
+```
+
+## Workflow
+
+1. Load credentials from `~/.config/whoop-skill/credentials.json`
+2. If `expires_at` is in the past (or within 60s), call `scripts/refresh_token.py` to get a new access token and update the file
+3. Call the appropriate endpoint (see `references/api.md`)
+4. Parse and present the data in plain language
+
+## Common Requests
+
+- **"How's my recovery today?"** → GET latest recovery score, HRV, RHR
+- **"How did I sleep?"** → GET latest sleep (performance %, stages, duration)
+- **"What's my strain today?"** → GET latest cycle strain + avg HR
+- **"Show my recent workouts"** → GET workout collection (last 5–7)
+- **"Give me a health summary"** → Combine recovery + sleep + today's cycle
+
+## Token Refresh
+
+Run `scripts/refresh_token.py` when the access token is expired. It reads/writes `~/.config/whoop-skill/credentials.json` automatically.
+
+To re-auth from scratch, run `scripts/auth.py` again.
+
+## API Base URL
+
+`https://api.prod.whoop.com/developer/v1`
+
+All requests: `Authorization: Bearer <access_token>`
+
+See `references/api.md` for endpoint details, scopes, and response shapes.
+
+---
+
+## Fetching Data (`scripts/fetch.py`)
+
+General-purpose API fetcher. Used internally by other scripts.
+
+```bash
+# Latest recovery
+python3 scripts/fetch.py /recovery --limit 1
+
+# Last 30 days of sleep
+python3 scripts/fetch.py /activity/sleep --limit 30
+
+# Workouts last 7 days
+python3 scripts/fetch.py /workout --limit 7
+
+# Date-range fetch
+python3 scripts/fetch.py /recovery --start 2026-02-01 --end 2026-02-28
+
+# User profile
+python3 scripts/fetch.py /user/profile/basic
+```
+
+Output is JSON to stdout.
+
+---
+
+## Charting (`scripts/chart.py`)
+
+Generates self-contained HTML charts using Chart.js (CDN). Dark theme with stat cards showing avg/min/max + trend arrow. Opens in browser automatically.
+
+### Chart Types
+
+| Chart | Description |
+|-------|-------------|
+| `recovery` | Bar chart color-coded green/yellow/red by recovery score |
+| `sleep` | Stacked bar: REM / Deep / Light / Awake per night |
+| `hrv` | Line chart with 7-day rolling average overlay |
+| `strain` | Bar chart with calories as secondary line axis |
+| `dashboard` | 2×2 grid of all four charts |
+
+### Usage
+
+```bash
+# Recovery chart (30 days)
+python3 scripts/chart.py --chart recovery --days 30
+
+# Full dashboard
+python3 scripts/chart.py --chart dashboard --days 30 --output ~/whoop-dashboard.html
+
+# HRV trend (90 days), don't auto-open
+python3 scripts/chart.py --chart hrv --days 90 --no-open
+
+# Sleep breakdown
+python3 scripts/chart.py --chart sleep --days 14
+
+# Strain + calories
+python3 scripts/chart.py --chart strain --days 21
+```
+
+### Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--chart` | (required) | Chart type: recovery, sleep, hrv, strain, dashboard |
+| `--days` | 30 | Days of history to fetch |
+| `--output` | `/tmp/whoop-<chart>.html` | Output file path |
+| `--no-open` | false | Don't auto-open in browser |
+
+### Chart Delivery (always do both)
+
+After running `chart.py`, the script prints the output file path to stdout. Always:
+1. **Attach the HTML file to the Telegram message** — so remote users get it instantly
+2. **Auto-open in browser** (default, unless `--no-open`) — so local users get it immediately
+
+This means both local and remote users are covered without any configuration. The file is self-contained, static, and safe to share — no credentials or API calls embedded.
+
+---
+
+## Experiment Tracking (`scripts/experiment.py`)
+
+Define, monitor, and evaluate personal health experiments. Data stored in `~/.openclaw/workspace/knowledge/whoop-experiments.json`.
+
+### Supported Metrics
+
+`hrv`, `recovery`, `sleep_performance`, `rhr`, `strain`
+
+### Commands
+
+#### Plan a new experiment
+```bash
+python3 scripts/experiment.py plan \
+  --name "No alcohol for 30 days" \
+  --hypothesis "HRV will increase 10%+ from baseline" \
+  --start 2026-03-01 \
+  --end 2026-03-31 \
+  --metrics hrv,recovery,sleep_performance
+```
+
+Baseline is auto-captured from the 14 days before `--start`. Override manually:
+```bash
+python3 scripts/experiment.py plan \
+  --name "Cold plunge experiment" \
+  --hypothesis "RHR will drop 3+ bpm" \
+  --start 2026-03-10 --end 2026-04-10 \
+  --metrics hrv,rhr \
+  --baseline-hrv 45.0 \
+  --baseline-rhr 58
+```
+
+#### List experiments
+```bash
+python3 scripts/experiment.py list
+```
+
+#### Check status (mid-experiment)
+```bash
+python3 scripts/experiment.py status --id <id>
+```
+Shows current averages vs baseline with % change and trend arrows.
+
+#### Final report
+```bash
+python3 scripts/experiment.py report --id <id>
+```
+Full before/after comparison, verdict (met / partially met / not met / inconclusive), plain-language summary.
+
+---
+
+## Obsidian Logging (`scripts/log_to_obsidian.py`)
+
+Appends today's WHOOP stats to the Obsidian daily note at:
+`<vault_path>/Daily Notes/YYYY-MM-DD.md` (configured via `vault_path` in `~/.config/whoop-skill/config.json`)
+
+After writing, commits and pushes the vault (`git add -A && git commit && git push`).
+
+### Usage
+
+```bash
+# Log today
+python3 scripts/log_to_obsidian.py
+
+# Backfill a specific date
+python3 scripts/log_to_obsidian.py --date 2026-03-01
+
+# Preview without writing
+python3 scripts/log_to_obsidian.py --dry-run
+```
+
+### Output format in daily note
+
+```markdown
+## 🏋️ WHOOP
+
+| Metric | Value |
+|--------|-------|
+| Recovery | 82% 💚 |
+| HRV | 54ms |
+| Resting HR | 58 bpm |
+| Sleep Performance | 91% |
+| Sleep Duration | 7h 42m |
+| Day Strain | 8.4 |
+
+_Logged by Hank at 7:15 AM ET_
+```
+
+- Creates the daily note if it doesn't exist
+- Skips silently if the WHOOP section already exists
+- Idempotent — safe to run multiple times
+
+---
+
+## Morning Brief Integration
+
+Add the following snippet to `HEARTBEAT.md` to include WHOOP recovery + HRV in morning briefs.
+
+```markdown
+## 🏋️ WHOOP Morning Check
+
+Run on heartbeats between 06:00–10:00 ET:
+
+1. Run: `python3 scripts/fetch.py /recovery --limit 1`
+2. Extract `records[0].score.recovery_score` and `records[0].score.hrv_rmssd_milli`
+3. Include in morning message:
+
+   > 🏋️ **WHOOP** — Recovery: {score}% {emoji} | HRV: {hrv}ms
+   > 
+   > _(Green 💚 = push hard. Yellow 💛 = moderate. Red 🔴 = rest day.)_
+
+4. If recovery < 34 (red), mention it proactively even if the user hasn't asked.
+5. Also run: `python3 scripts/log_to_obsidian.py`
+   to log stats to Obsidian automatically.
+```
+
+**Copy-paste ready HEARTBEAT.md snippet:**
+
+```markdown
+### WHOOP (run once, 06:00–10:00 ET)
+- Fetch recovery: `python3 ~/.openclaw/workspace/skills/whoop/scripts/fetch.py /recovery --limit 1`
+- Parse recovery_score + hrv_rmssd_milli from records[0].score
+- Report: "🏋️ Recovery: {score}% | HRV: {hrv}ms" (add 💚/💛/🔴 based on score ≥67 / ≥34 / <34)
+- If red recovery, mention proactively
+- Log to Obsidian: `python3 ~/.openclaw/workspace/skills/whoop/scripts/log_to_obsidian.py`
+```
+
+---
+
+## Health Interpretation
+
+See `references/health_analysis.md` for a science-backed guide covering:
+- HRV (RMSSD) ranges by age, what trends mean, red flags
+- Resting heart rate interpretation by fitness level
+- Sleep stage breakdown (deep/REM/light targets, deficit consequences)
+- Recovery score zones (green/yellow/red) and recommended actions
+- Strain scale and how to match strain to recovery
+- SpO2 and skin temperature context
+- Overtraining pattern recognition
+- When to see a doctor
+
+---
+
+## References
+
+- `references/api.md` — Full WHOOP API endpoint reference
+- `references/health_analysis.md` — Health metric interpretation guide
+- WHOOP Developer Dashboard: https://developer-dashboard.whoop.com
+- WHOOP API docs: https://developer.whoop.com/api
