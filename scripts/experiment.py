@@ -15,6 +15,7 @@ Usage:
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import uuid
@@ -23,7 +24,8 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 FETCH_SCRIPT = SCRIPT_DIR / "fetch.py"
-EXPERIMENTS_FILE = Path.home() / ".openclaw/workspace/knowledge/whoop-experiments.json"
+EXPERIMENTS_FILE = Path(os.environ.get("WHOOP_EXPERIMENTS_FILE",
+    Path.home() / ".config/whoop-skill/experiments.json"))
 
 METRIC_KEYS = {
     "hrv": ("recovery", "score.hrv_rmssd_milli"),

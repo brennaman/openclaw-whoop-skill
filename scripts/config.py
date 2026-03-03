@@ -5,7 +5,7 @@ Reads config.json from ~/.config/whoop-skill/config.json.
 All path values support ~ expansion. Users can override any value in config.json.
 
 Config keys:
-  creds_path       - Path to whoop-credentials.json (OAuth tokens)
+  creds_path       - Path to credentials.json (OAuth tokens)
   vault_path       - Root of your Obsidian vault
   daily_notes_subdir - Subfolder inside vault for daily notes (default: "Daily Notes")
   timezone         - Your local timezone (default: "America/New_York")
