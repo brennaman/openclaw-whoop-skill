@@ -111,7 +111,7 @@ To re-auth from scratch, run `scripts/auth.py` again.
 
 ## API Base URL
 
-`https://api.prod.whoop.com/developer/v1`
+`https://api.prod.whoop.com/developer/v2`
 
 All requests: `Authorization: Bearer <access_token>`
 
