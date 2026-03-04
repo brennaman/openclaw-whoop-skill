@@ -25,7 +25,7 @@ _DEFAULTS = {
     "vault_path": "~/obsidian-vault",
     "daily_notes_subdir": "Daily Notes",
     "timezone": "America/New_York",
-    "logged_by": "Hank",
+    "logged_by": "Assistant",
 }
 
 
