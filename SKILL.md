@@ -1,6 +1,6 @@
 ---
 name: whoop
-version: 1.1.0
+version: 1.0.0
 description: "Fetch, analyze, chart, and track WHOOP health data (recovery, HRV, RHR, sleep, strain, workouts). Use when: querying any WHOOP metric; generating visual charts or dashboards; planning, monitoring, or reporting on a health experiment (with auto-captured baselines, post-workout segmentation); logging stats to Obsidian; correlating health data with life context; or proactively flagging suppressed recovery trends. Handles OAuth, token refresh, full history pagination, and science-backed metric interpretation (HRV ranges by age, overtraining signals, sleep stage targets, medication context)."
 metadata:
   openclaw:
@@ -60,7 +60,7 @@ Before creating your WHOOP app, decide how you want to handle the OAuth callback
 3. Create a Team if prompted (any name works)
 4. Click **Create App** and fill in:
    - **App name:** anything (e.g. "My WHOOP Skill")
-   - **Redirect URI:** the URI from Step 1 (Option A, B, or C)
+   - **Redirect URI:** the URI from Step 1 (Option A or B)
    - **Scopes:** select all `read:*` scopes + `offline`
 5. Copy your **Client ID** and **Client Secret** — you'll need them in the next step
 
@@ -72,7 +72,7 @@ python3 scripts/auth.py
 
 This will:
 1. Prompt you for your Client ID and Client Secret
-2. Ask which callback method you chose in Step 1 (local server, relay, or manual)
+2. Ask which callback method you chose in Step 1 (local server or manual)
 3. Walk you through the authorization flow
 4. Save credentials to `~/.config/whoop-skill/credentials.json`
 
@@ -84,7 +84,7 @@ Copy `config.json.example` from the skill root to `~/.config/whoop-skill/config.
   "vault_path": "~/my-obsidian-vault",
   "daily_notes_subdir": "Daily Notes",
   "timezone": "America/New_York",
-  "logged_by": "Hank"
+  "logged_by": "Assistant"
 }
 ```
 
@@ -111,7 +111,7 @@ To re-auth from scratch, run `scripts/auth.py` again.
 
 ## API Base URL
 
-`https://api.prod.whoop.com/developer/v1`
+`https://api.prod.whoop.com/developer/v2`
 
 All requests: `Authorization: Bearer <access_token>`
 
@@ -315,7 +315,7 @@ python3 scripts/log_to_obsidian.py --dry-run
 | Sleep Duration | 7h 42m |
 | Day Strain | 8.4 |
 
-_Logged by Hank at 7:15 AM ET_
+_Logged by Assistant at 7:15 AM ET_
 ```
 
 - Creates the daily note if it doesn't exist
