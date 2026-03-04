@@ -9,6 +9,7 @@ metadata:
     requires:
       bins:
         - python3
+        - git
 ---
 
 # WHOOP Skill
@@ -32,6 +33,12 @@ The directory and `credentials.json` are created automatically when you run `scr
 
 > **Before you begin:** This skill requires a WHOOP Developer App to authenticate with the WHOOP API. It's free and takes about 2 minutes to set up.
 
+### Step 0 — Install Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
 ### Step 1 — Choose your callback method
 
 Before creating your WHOOP app, decide how you want to handle the OAuth callback:
@@ -41,15 +48,7 @@ Before creating your WHOOP app, decide how you want to handle the OAuth callback
 - A temporary server runs on your machine to catch the redirect automatically
 - Requires a browser on the same machine as OpenClaw
 
-**Option B — paulbrennaman.me relay** *(remote/cloud installs — best experience)*
-- **Redirect URI:** `https://www.paulbrennaman.me/api/whoop/callback`
-- The script prints an authorization URL — open it in any browser (e.g. on your laptop)
-- After authorizing, you'll be shown a retrieval code on paulbrennaman.me — paste it into the script
-- No local browser or open ports needed on the server
-- Tokens are never stored: held in memory for 10 minutes and deleted after retrieval
-- See https://paulbrennaman.me/privacy for details
-
-**Option C — Manual code paste** *(remote/cloud installs — no third-party relay)*
+**Option B — Manual code paste** *(remote/cloud installs)*
 - **Redirect URI:** `http://localhost:8888/callback`
 - The script prints an authorization URL — open it in any browser, authorize, then copy the `?code=` value from the redirect URL and paste it back into the script
 - Nothing passes through any external server — fully self-contained

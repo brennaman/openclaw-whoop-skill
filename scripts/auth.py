@@ -4,9 +4,8 @@ WHOOP OAuth 2.0 Setup
 
 Guides you through connecting your WHOOP account:
   1. Prompts for your WHOOP Developer App client ID and secret
-  2. Opens a browser to authorize access
-  3. Catches the OAuth callback on a local server
-  4. Saves tokens to ~/.config/whoop-skill/credentials.json
+  2. Opens a browser to authorize access (local server or manual code paste)
+  3. Saves tokens to ~/.config/whoop-skill/credentials.json
 
 Run this once to get set up. Tokens are refreshed automatically by other scripts.
 
@@ -33,7 +32,6 @@ TOKEN_URL = "https://api.prod.whoop.com/oauth/oauth2/token"
 SCOPES = "offline read:recovery read:cycles read:workout read:sleep read:profile read:body_measurement"
 REDIRECT_PORT = 8888
 REDIRECT_URI_LOCAL = f"http://localhost:{REDIRECT_PORT}/callback"
-REDIRECT_URI_RELAY = "https://www.paulbrennaman.me/api/whoop/callback"
 
 auth_code = None
 state_value = None
@@ -80,39 +78,30 @@ def main():
     print("=" * 60)
     print()
 
-    # Step 1: Choose callback method first so we know the correct redirect URI
+    # Step 1: Choose callback method
     print("Step 1 of 3 — Choose your callback method")
     print()
-    print("  [A] Local server (default — local installs)")
+    print("  [A] Local server (default)")
     print(f"      Redirect URI: {REDIRECT_URI_LOCAL}")
     print("      Spins up a temporary server on localhost:8888 to catch the redirect.")
     print("      Requires a browser on the same machine as OpenClaw.")
     print()
-    print("  [B] paulbrennaman.me relay (recommended — remote/cloud installs)")
-    print(f"      Redirect URI: {REDIRECT_URI_RELAY}")
-    print("      Open the auth URL in any browser (e.g. your laptop).")
-    print("      After authorizing, paste the retrieval code shown on paulbrennaman.me.")
-    print("      Tokens are never stored — deleted after retrieval (10 min TTL).")
-    print("      Privacy policy: https://paulbrennaman.me/privacy")
-    print()
-    print("  [C] Manual code paste (remote/cloud — no third-party relay)")
+    print("  [B] Manual code paste (remote/cloud installs)")
     print(f"      Redirect URI: {REDIRECT_URI_LOCAL}")
     print("      Open the auth URL in any browser, authorize, then copy the")
     print("      ?code= value from the redirect URL and paste it here.")
+    print("      No local browser or open ports needed on the server.")
     print()
     choice = input("Choice [A]: ").strip().upper()
 
     if choice == "B":
-        mode = "relay"
-        redirect_uri = REDIRECT_URI_RELAY
-    elif choice == "C":
         mode = "manual"
-        redirect_uri = REDIRECT_URI_LOCAL
     else:
         mode = "local"
-        redirect_uri = REDIRECT_URI_LOCAL
 
-    # Step 2: Create the Whoop app with the correct redirect URI
+    redirect_uri = REDIRECT_URI_LOCAL
+
+    # Step 2: Create the WHOOP app with the correct redirect URI
     print()
     print("Step 2 of 3 — Create your WHOOP Developer App")
     print()
@@ -169,23 +158,7 @@ def main():
     }
     auth_url = f"{AUTH_URL}?{urlencode(params)}"
 
-    if mode == "relay":
-        print()
-        print("Open this URL in your browser to authorize WHOOP access:")
-        print(f"\n  {auth_url}\n")
-        print("After authorizing, you'll see a retrieval code on paulbrennaman.me.")
-        retrieval_code = input("Paste your retrieval code here: ").strip().upper()
-        if not retrieval_code:
-            print("ERROR: No retrieval code entered.")
-            sys.exit(1)
-        print("Fetching tokens from relay...")
-        relay_resp = requests.get(f"https://www.paulbrennaman.me/api/whoop/token/{retrieval_code}")
-        if not relay_resp.ok:
-            print(f"ERROR: Could not retrieve tokens: {relay_resp.text}")
-            sys.exit(1)
-        data = relay_resp.json()
-
-    elif mode == "manual":
+    if mode == "manual":
         print()
         print("Open this URL in your browser to authorize:")
         print(f"\n  {auth_url}\n")
