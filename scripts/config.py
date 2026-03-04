@@ -9,7 +9,7 @@ Config keys:
   vault_path       - Root of your Obsidian vault
   daily_notes_subdir - Subfolder inside vault for daily notes (default: "Daily Notes")
   timezone         - Your local timezone (default: "America/New_York")
-  logged_by        - Name shown in the "Logged by X" footer (default: "Hank")
+  logged_by        - Name shown in the "Logged by X" footer (default: "Assistant")
 """
 
 import json

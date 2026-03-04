@@ -84,7 +84,7 @@ Copy `config.json.example` from the skill root to `~/.config/whoop-skill/config.
   "vault_path": "~/my-obsidian-vault",
   "daily_notes_subdir": "Daily Notes",
   "timezone": "America/New_York",
-  "logged_by": "Hank"
+  "logged_by": "Assistant"
 }
 ```
 
@@ -315,7 +315,7 @@ python3 scripts/log_to_obsidian.py --dry-run
 | Sleep Duration | 7h 42m |
 | Day Strain | 8.4 |
 
-_Logged by Hank at 7:15 AM ET_
+_Logged by Assistant at 7:15 AM ET_
 ```
 
 - Creates the daily note if it doesn't exist
