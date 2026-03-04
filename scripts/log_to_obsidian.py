@@ -172,6 +172,19 @@ def main():
     else:
         date_str = datetime.now(ET).strftime("%Y-%m-%d")
 
+    # Guard: check vault path exists before writing
+    if not VAULT_PATH.exists():
+        print(f"ERROR: Vault path does not exist: {VAULT_PATH}", file=sys.stderr)
+        print("Configure vault_path in ~/.config/whoop-skill/config.json", file=sys.stderr)
+        print("or copy config.json.example and update the path.", file=sys.stderr)
+        sys.exit(1)
+
+    # Check vault path is configured and exists
+    if not VAULT_PATH or not VAULT_PATH.exists():
+        print(f"ERROR: Obsidian vault not found at {VAULT_PATH}", file=sys.stderr)
+        print("Set 'vault_path' in ~/.config/whoop-skill/config.json to your vault directory.", file=sys.stderr)
+        sys.exit(1)
+
     print(f"Logging WHOOP stats for {date_str}...", file=sys.stderr)
 
     section = build_whoop_section(date_str)
