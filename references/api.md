@@ -84,8 +84,8 @@ Response (score object):
 
 ### Workout
 
-`GET /workout` — paginated collection
-`GET /workout/{workoutId}` — by ID
+`GET /activity/workout` — paginated collection
+`GET /activity/workout/{workoutId}` — by ID
 
 Response (score object):
 ```json

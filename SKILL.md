@@ -80,7 +80,7 @@ Copy `config.json.example` from the skill root to `~/.config/whoop-skill/config.
 - **"How's my recovery today?"** → GET latest recovery score, HRV, RHR
 - **"How did I sleep?"** → GET latest sleep (performance %, stages, duration)
 - **"What's my strain today?"** → GET latest cycle strain + avg HR
-- **"Show my recent workouts"** → GET workout collection (last 5–7)
+- **"Show my recent workouts"** → GET workout collection (last 5–7) via `/activity/workout`
 - **"Give me a health summary"** → Combine recovery + sleep + today's cycle
 
 ## Token Refresh
@@ -111,7 +111,7 @@ python3 scripts/fetch.py /recovery --limit 1
 python3 scripts/fetch.py /activity/sleep --limit 30
 
 # Workouts last 7 days
-python3 scripts/fetch.py /workout --limit 7
+python3 scripts/fetch.py /activity/workout --limit 7
 
 # Date-range fetch
 python3 scripts/fetch.py /recovery --start 2026-02-01 --end 2026-02-28
@@ -178,7 +178,7 @@ This means both local and remote users are covered without any configuration. Th
 
 ## Experiment Tracking (`scripts/experiment.py`)
 
-Define, monitor, and evaluate personal health experiments. Data stored in `~/.openclaw/workspace/knowledge/whoop-experiments.json`.
+Define, monitor, and evaluate personal health experiments. Data stored in `~/.config/whoop-skill/experiments.json`.
 
 ### Supported Metrics
 
@@ -207,6 +207,39 @@ python3 scripts/experiment.py plan \
   --baseline-rhr 58
 ```
 
+#### Plan with post-workout segmentation
+
+Use `--segment-workouts` when your hypothesis is specifically about recovery *after training sessions* rather than overall daily averages. The tracker will fetch your workout history, identify qualifying sessions, and measure recovery metrics only in the 24–48h window after each workout.
+
+```bash
+python3 scripts/experiment.py plan \
+  --name "My supplement experiment" \
+  --hypothesis "Post-strength recovery improves 10%+ vs baseline" \
+  --start YYYY-MM-DD --end YYYY-MM-DD \
+  --metrics hrv,recovery,rhr \
+  --segment-workouts \
+  --min-strain 5
+```
+
+Flags:
+- `--segment-workouts` — enables post-workout segmentation mode
+- `--min-strain <float>` — minimum workout strain to qualify (default: 5.0). Filters out light activity like walking or yoga.
+- `--days-after <range>` — recovery window to measure, e.g. `1-2` (days 1 and 2 after workout) or `1` (next day only). Default: `1-2`
+
+When segmentation is on, `status` and `report` show **two views**: overall rolling averages (all days) and post-workout recovery (only the days after qualifying workouts). The verdict is evaluated against the post-workout view.
+
+The post-workout baseline is also segmented — auto-captured from qualifying workouts in the 14 days before `--start` — so the comparison is apples-to-apples.
+
+#### Add segmentation to an existing experiment
+```bash
+python3 scripts/experiment.py add-segmentation \
+  --id <id> \
+  --min-strain 5 \
+  --days-after 1-2
+```
+
+Patches a previously created experiment to add post-workout segmentation and recomputes the post-workout baseline from the original baseline window.
+
 #### List experiments
 ```bash
 python3 scripts/experiment.py list
@@ -216,13 +249,13 @@ python3 scripts/experiment.py list
 ```bash
 python3 scripts/experiment.py status --id <id>
 ```
-Shows current averages vs baseline with % change and trend arrows.
+Shows current averages vs baseline with % change and trend arrows. If segmentation is enabled, shows both overall and post-workout views with a per-workout breakdown.
 
 #### Final report
 ```bash
 python3 scripts/experiment.py report --id <id>
 ```
-Full before/after comparison, verdict (met / partially met / not met / inconclusive), plain-language summary.
+Full before/after comparison, verdict (met / partially met / not met / inconclusive), plain-language summary. Verdict is evaluated on post-workout data when segmentation is on.
 
 ---
 
