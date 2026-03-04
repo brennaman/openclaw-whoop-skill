@@ -115,7 +115,7 @@ To re-auth from scratch, run `scripts/auth.py` again.
 
 All requests: `Authorization: Bearer <access_token>`
 
-See `references/api.md` for endpoint details, scopes, and response shapes.
+See `references/api.md` for endpoint details, scopes, and response shapes. For the full official API documentation (including error codes and rate limits), see https://developer.whoop.com/api.
 
 ---
 
