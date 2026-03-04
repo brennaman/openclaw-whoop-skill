@@ -7,6 +7,19 @@ description: Fetch, analyze, chart, and track WHOOP health data (recovery, HRV, 
 
 Fetch, interpret, chart, and track your WHOOP data via the WHOOP Developer API (v2).
 
+## Data Directory
+
+All user-specific data is stored in `~/.config/whoop-skill/` — separate from the skill install directory, which is read-only.
+
+```
+~/.config/whoop-skill/
+  credentials.json   — OAuth tokens (created by auth.py on first setup)
+  experiments.json   — experiment tracking data (created on first `plan` command)
+  config.json        — optional path/timezone overrides (copy from config.json.example)
+```
+
+The directory and `credentials.json` are created automatically when you run `scripts/auth.py`. You never need to create them manually.
+
 ## Setup
 
 > **Before you begin:** This skill requires a WHOOP Developer App to authenticate with the WHOOP API. It's free and takes about 2 minutes to set up.
