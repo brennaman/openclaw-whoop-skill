@@ -9,9 +9,9 @@ Usage:
     --metrics hrv,recovery,sleep_performance
 
   # With post-workout segmentation (tests hypothesis against recovery AFTER workouts):
-  python3 experiment.py plan --name "Creatine loading phase" \
+  python3 experiment.py plan --name "My supplement experiment" \
     --hypothesis "Post-strength recovery improves 10%+" \
-    --start 2026-04-01 --end 2026-05-31 \
+    --start YYYY-MM-DD --end YYYY-MM-DD \
     --metrics hrv,recovery,rhr \
     --segment-workouts \
     --min-strain 5
