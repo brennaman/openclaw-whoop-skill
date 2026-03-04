@@ -1,6 +1,6 @@
 ---
 name: whoop
-description: Fetch, analyze, chart, and track WHOOP health data (recovery, HRV, RHR, sleep, strain, workouts). Use when: querying any WHOOP metric; generating visual charts or dashboards; planning, monitoring, or reporting on a health experiment (with auto-captured baselines, post-workout segmentation); logging stats to Obsidian; correlating health data with life context; or proactively flagging suppressed recovery trends. Handles OAuth, token refresh, full history pagination, and science-backed metric interpretation (HRV ranges by age, overtraining signals, sleep stage targets, medication context).
+description: "Fetch, analyze, chart, and track WHOOP health data (recovery, HRV, RHR, sleep, strain, workouts). Use when: querying any WHOOP metric; generating visual charts or dashboards; planning, monitoring, or reporting on a health experiment (with auto-captured baselines, post-workout segmentation); logging stats to Obsidian; correlating health data with life context; or proactively flagging suppressed recovery trends. Handles OAuth, token refresh, full history pagination, and science-backed metric interpretation (HRV ranges by age, overtraining signals, sleep stage targets, medication context)."
 ---
 
 # WHOOP Skill
