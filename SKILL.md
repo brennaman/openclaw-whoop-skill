@@ -281,6 +281,8 @@ Full before/after comparison, verdict (met / partially met / not met / inconclus
 
 ## Obsidian Logging (`scripts/log_to_obsidian.py`)
 
+> **Note:** `git` is only required if your Obsidian vault syncs to a GitHub repository. If it isn't a git repo, the script writes the daily note and skips the sync step gracefully — no errors.
+
 Appends today's WHOOP stats to the Obsidian daily note at:
 `<vault_path>/Daily Notes/YYYY-MM-DD.md` (configured via `vault_path` in `~/.config/whoop-skill/config.json`)
 
