@@ -281,7 +281,7 @@ Full before/after comparison, verdict (met / partially met / not met / inconclus
 
 ## Obsidian Logging (`scripts/log_to_obsidian.py`)
 
-> **Note:** `git` is only required if your Obsidian vault syncs to a GitHub repository. If it isn't a git repo, the script writes the daily note and skips the sync step gracefully — no errors.
+> **Note:** `git` is declared as a dependency because the script calls git commands, but it is only ever invoked if your Obsidian vault is a git repository. If the vault directory has no `.git` folder, the script detects this, writes the daily note, and skips all git commands — no errors, no git required in practice.
 
 Appends today's WHOOP stats to the Obsidian daily note at:
 `<vault_path>/Daily Notes/YYYY-MM-DD.md` (configured via `vault_path` in `~/.config/whoop-skill/config.json`)
