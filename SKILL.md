@@ -60,7 +60,7 @@ Before creating your WHOOP app, decide how you want to handle the OAuth callback
 3. Create a Team if prompted (any name works)
 4. Click **Create App** and fill in:
    - **App name:** anything (e.g. "My WHOOP Skill")
-   - **Redirect URI:** the URI from Step 1 (Option A, B, or C)
+   - **Redirect URI:** the URI from Step 1 (Option A or B)
    - **Scopes:** select all `read:*` scopes + `offline`
 5. Copy your **Client ID** and **Client Secret** — you'll need them in the next step
 
@@ -72,7 +72,7 @@ python3 scripts/auth.py
 
 This will:
 1. Prompt you for your Client ID and Client Secret
-2. Ask which callback method you chose in Step 1 (local server, relay, or manual)
+2. Ask which callback method you chose in Step 1 (local server or manual)
 3. Walk you through the authorization flow
 4. Save credentials to `~/.config/whoop-skill/credentials.json`
 
