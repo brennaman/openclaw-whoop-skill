@@ -213,9 +213,9 @@ Use `--segment-workouts` when your hypothesis is specifically about recovery *af
 
 ```bash
 python3 scripts/experiment.py plan \
-  --name "CoQ10 supplementation" \
+  --name "Creatine loading phase" \
   --hypothesis "Post-strength recovery improves 10%+ vs baseline" \
-  --start 2026-03-05 --end 2026-04-30 \
+  --start 2026-04-01 --end 2026-05-31 \
   --metrics hrv,recovery,rhr \
   --segment-workouts \
   --min-strain 5
