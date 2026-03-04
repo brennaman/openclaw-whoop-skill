@@ -24,7 +24,7 @@ All user-specific data is stored in `~/.config/whoop-skill/` — separate from t
 ~/.config/whoop-skill/
   credentials.json   — OAuth tokens (created by auth.py on first setup)
   experiments.json   — experiment tracking data (created on first `plan` command)
-  config.json        — optional path/timezone overrides (copy from config.json.example)
+  config.json        — optional path/timezone overrides (copy from config.example.json)
 ```
 
 The directory and `credentials.json` are created automatically when you run `scripts/auth.py`. You never need to create them manually.
@@ -77,7 +77,7 @@ This will:
 4. Save credentials to `~/.config/whoop-skill/credentials.json`
 
 **Customize paths (optional):**
-Copy `config.json.example` from the skill root to `~/.config/whoop-skill/config.json` and edit to override defaults:
+Copy `config.example.json` from the skill root to `~/.config/whoop-skill/config.json` and edit to override defaults:
 ```json
 {
   "creds_path": "~/.config/whoop-skill/credentials.json",
