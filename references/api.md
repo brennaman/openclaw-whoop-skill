@@ -39,9 +39,8 @@ Response (score object):
 
 ### Sleep
 
-`GET /sleep` — paginated collection
-`GET /sleep/{sleepId}` — by ID
-`GET /cycle/{cycleId}/sleep` — sleep for a cycle
+`GET /activity/sleep` — paginated collection
+`GET /activity/sleep/{sleepId}` — by ID
 
 Response (score object):
 ```json

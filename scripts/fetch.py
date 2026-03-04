@@ -10,7 +10,7 @@ Examples:
   python3 fetch.py /recovery --days 30          # last 30 days (auto-paginated)
   python3 fetch.py /recovery --all              # entire account history
   python3 fetch.py /activity/sleep --start 2025-01-01 --end 2025-12-31 --all
-  python3 fetch.py /workout --days 90
+  python3 fetch.py /activity/workout --days 90
   python3 fetch.py /user/profile/basic          # non-paginated endpoint
 """
 

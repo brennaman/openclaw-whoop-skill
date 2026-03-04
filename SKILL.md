@@ -115,7 +115,7 @@ To re-auth from scratch, run `scripts/auth.py` again.
 
 All requests: `Authorization: Bearer <access_token>`
 
-See `references/api.md` for endpoint details, scopes, and response shapes.
+See `references/api.md` for endpoint details, scopes, and response shapes. For the full official API documentation (including error codes and rate limits), see https://developer.whoop.com/api.
 
 ---
 
@@ -279,7 +279,9 @@ Full before/after comparison, verdict (met / partially met / not met / inconclus
 
 ---
 
-## Obsidian Logging (`scripts/log_to_obsidian.py`)
+## Obsidian Logging (`scripts/log_to_obsidian.py`) *(optional)*
+
+> **This feature is entirely optional.** If you don't use Obsidian, skip this section — the rest of the skill works without it. To enable it, set `vault_path` in `~/.config/whoop-skill/config.json` to your Obsidian vault directory. The script will not run if no vault is configured.
 
 > **Note:** `git` is declared as a dependency because the script calls git commands, but it is only ever invoked if your Obsidian vault is a git repository. If the vault directory has no `.git` folder, the script detects this, writes the daily note, and skips all git commands — no errors, no git required in practice.
 
@@ -342,19 +344,18 @@ Run on heartbeats between 06:00–10:00 ET:
    > _(Green 💚 = push hard. Yellow 💛 = moderate. Red 🔴 = rest day.)_
 
 4. If recovery < 34 (red), mention it proactively even if the user hasn't asked.
-5. Also run: `python3 scripts/log_to_obsidian.py`
-   to log stats to Obsidian automatically.
+5. If Obsidian logging is configured, also run: `python3 scripts/log_to_obsidian.py`
 ```
 
 **Copy-paste ready HEARTBEAT.md snippet:**
 
 ```markdown
 ### WHOOP (run once, 06:00–10:00 ET)
-- Fetch recovery: `python3 ~/.openclaw/workspace/skills/whoop/scripts/fetch.py /recovery --limit 1`
+- Fetch recovery: `python3 scripts/fetch.py /recovery --limit 1`
 - Parse recovery_score + hrv_rmssd_milli from records[0].score
 - Report: "🏋️ Recovery: {score}% | HRV: {hrv}ms" (add 💚/💛/🔴 based on score ≥67 / ≥34 / <34)
 - If red recovery, mention proactively
-- Log to Obsidian: `python3 ~/.openclaw/workspace/skills/whoop/scripts/log_to_obsidian.py`
+- Log to Obsidian (if configured): `python3 scripts/log_to_obsidian.py`
 ```
 
 ---
