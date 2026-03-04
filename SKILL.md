@@ -1,11 +1,24 @@
 ---
 name: whoop
-description: Fetch and analyze WHOOP health/fitness data for the authenticated user. Use when the user asks about their WHOOP stats, recovery score, HRV, sleep performance, strain, workouts, or wants a summary of recent health metrics. Handles OAuth token management (access + refresh), querying the WHOOP API, and presenting data in a readable format. See references/api.md for full endpoint reference.
+description: Fetch, analyze, chart, and track WHOOP health data (recovery, HRV, RHR, sleep, strain, workouts). Use when: querying any WHOOP metric; generating visual charts or dashboards; planning, monitoring, or reporting on a health experiment (with auto-captured baselines, post-workout segmentation); logging stats to Obsidian; correlating health data with life context; or proactively flagging suppressed recovery trends. Handles OAuth, token refresh, full history pagination, and science-backed metric interpretation (HRV ranges by age, overtraining signals, sleep stage targets, medication context).
 ---
 
 # WHOOP Skill
 
 Fetch, interpret, chart, and track your WHOOP data via the WHOOP Developer API (v2).
+
+## Data Directory
+
+All user-specific data is stored in `~/.config/whoop-skill/` — separate from the skill install directory, which is read-only.
+
+```
+~/.config/whoop-skill/
+  credentials.json   — OAuth tokens (created by auth.py on first setup)
+  experiments.json   — experiment tracking data (created on first `plan` command)
+  config.json        — optional path/timezone overrides (copy from config.json.example)
+```
+
+The directory and `credentials.json` are created automatically when you run `scripts/auth.py`. You never need to create them manually.
 
 ## Setup
 
